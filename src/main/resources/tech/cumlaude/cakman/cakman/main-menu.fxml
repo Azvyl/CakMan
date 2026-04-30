@@ -6,11 +6,11 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tech.cumlaude.cakman.cakman.UIController">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tech.cumlaude.cakman.cakman.controller.MainMenuController">
    <children>
       <ImageView fitHeight="1024.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@images/main_menu_bg.png" />
+            <Image url="@images/background/main_menu.png" />
          </image>
       </ImageView>
       <VBox alignment="BOTTOM_CENTER" spacing="10.0" StackPane.alignment="BOTTOM_CENTER">
@@ -24,7 +24,7 @@
                      <graphic>
                         <ImageView fitHeight="80.0" fitWidth="152.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@images/btn_score.png" />
+                              <Image url="@images/button/score.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -32,11 +32,11 @@
                         <Cursor fx:constant="HAND" />
                      </cursor>
                   </Button>
-                  <Button fx:id="btnPlay" mnemonicParsing="false" style="-fx-background-color: transparent;">
+                  <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#onPlayClick" style="-fx-background-color: transparent;">
                      <graphic>
                         <ImageView fitHeight="80.0" fitWidth="138.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@images/btn_play.png" />
+                              <Image url="@images/button/play.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -48,7 +48,7 @@
                      <graphic>
                         <ImageView fitHeight="80.0" fitWidth="152.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@images/btn_exit.png" />
+                              <Image url="@images/button/exit.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -62,7 +62,7 @@
                <graphic>
                   <ImageView fitHeight="60.0" fitWidth="59.0" pickOnBounds="true" preserveRatio="true">
                      <image>
-                        <Image url="@images/music_on.png" />
+                        <Image url="@images/button/music_on.png" />
                      </image>
                   </ImageView>
                </graphic>
