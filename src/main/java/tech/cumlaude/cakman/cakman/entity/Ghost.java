@@ -12,8 +12,13 @@ public class Ghost extends Entity {
     private long lastDecisionNanos;
 
     public Ghost(double x, double y, double speed) {
-        super(x, y, speed, null);
+        super(x, y, speed);
         setDirection(random.nextBoolean() ? Direction.RIGHT : Direction.LEFT);
+    }
+
+    @Override
+    protected void updateSpritePosition() {
+
     }
 
     public State getState() {
@@ -49,5 +54,19 @@ public class Ghost extends Entity {
     public enum State {
         NORMAL,
         FRIGHTENED
+    }
+
+    public enum Type {
+        AMERIKA,
+        BELANDA,
+        JEPANG;
+
+        public String getImagePath() {
+            return switch (this) {
+                case AMERIKA -> "/tech/cumlaude/cakman/cakman/images/ghost/amerika";
+                case BELANDA -> "/tech/cumlaude/cakman/cakman/images/ghost/belanda";
+                case JEPANG -> "/tech/cumlaude/cakman/cakman/images/ghost/jepang";
+            };
+        }
     }
 }

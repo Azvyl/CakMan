@@ -9,5 +9,11 @@
          <image>
             <Image url="@images/background/game.png" />
          </image></ImageView>
+      <VBox alignment="TOP_CENTER" StackPane.alignment="TOP_CENTER">
+         <children>
+            <HBox prefHeight="100.0" prefWidth="200.0" />
+            <Pane fx:id="mazeContainer" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="728.0" prefWidth="728.0" />
+         </children>
+      </VBox>
    </children>
 </StackPane>

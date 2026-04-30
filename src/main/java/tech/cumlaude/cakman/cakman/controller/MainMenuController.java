@@ -1,10 +1,15 @@
 package tech.cumlaude.cakman.cakman.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import tech.cumlaude.cakman.cakman.world.MapData;
+import tech.cumlaude.cakman.cakman.world.MapRenderer;
 
 public class MainMenuController {
     @FXML
@@ -49,7 +54,18 @@ public class MainMenuController {
 
     @FXML
     private void onPlayClick() {
+        try {
+            Stage stage = (Stage) btnPlay.getScene().getWindow();
+            Scene scene = stage.getScene();
 
+            Pane gameRoot = javafx.fxml.FXMLLoader.load(getClass().getResource("/tech/cumlaude/cakman/cakman/game.fxml"));
+            scene.setRoot(gameRoot);
+
+            MapRenderer renderer = new MapRenderer((Pane) gameRoot.lookup("#mazeContainer"));
+            renderer.render();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

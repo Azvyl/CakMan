@@ -1,21 +1,24 @@
 package tech.cumlaude.cakman.cakman.entity;
 
+import tech.cumlaude.cakman.cakman.world.MapData;
+
 public abstract class Entity {
 
-    protected double x;
-    protected double y;
+    protected double x, y;
     protected double speed;
     protected Direction direction;
 
-    protected Entity(double x, double y, double speed) {
-        this(x, y, speed, null);
+    protected Entity(double gridX, double gridY, double speed) {
+        this(gridX, gridY, speed, null);
     }
 
-    protected Entity(double x, double y, double speed, Direction direction) {
-        this.x = x;
-        this.y = y;
+    protected Entity(double gridX, double gridY, double speed, Direction direction) {
+        this.x = gridX * MapData.TILE_SIZE;
+        this.y = gridY * MapData.TILE_SIZE;
         this.speed = speed;
         this.direction = direction;
+
+        updateSpritePosition();
     }
 
     public double getX() {
@@ -63,6 +66,8 @@ public abstract class Entity {
         x += deltaX;
         y += deltaY;
     }
+
+    protected abstract void updateSpritePosition();
 
     public abstract void move();
 

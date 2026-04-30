@@ -6,7 +6,12 @@ public class CakMan extends Entity {
     private long superModeEndsAtNanos;
 
     public CakMan(double x, double y, double speed) {
-        super(x, y, speed, null);
+        super(x, y, speed);
+    }
+
+    @Override
+    protected void updateSpritePosition() {
+
     }
 
     public void requestDirection(Direction direction) {
