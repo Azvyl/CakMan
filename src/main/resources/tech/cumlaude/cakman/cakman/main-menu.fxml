@@ -58,7 +58,7 @@
                   </Button>
                </children>
             </HBox>
-            <Button fx:id="btnMusic" mnemonicParsing="false" style="-fx-background-color: transparent;">
+            <Button fx:id="btnMusic" mnemonicParsing="false" onAction="#onMusicClick" style="-fx-background-color: transparent;">
                <graphic>
                   <ImageView fitHeight="60.0" fitWidth="59.0" pickOnBounds="true" preserveRatio="true">
                      <image>
