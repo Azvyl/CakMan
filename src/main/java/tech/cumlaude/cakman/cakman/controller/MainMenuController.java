@@ -8,8 +8,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import tech.cumlaude.cakman.cakman.world.MapData;
-import tech.cumlaude.cakman.cakman.world.MapRenderer;
 
 public class MainMenuController {
     @FXML
@@ -57,15 +55,12 @@ public class MainMenuController {
         try {
             Stage stage = (Stage) btnPlay.getScene().getWindow();
 
-            // Use FXMLLoader instance so we can get the controller and call startGame
             javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/tech/cumlaude/cakman/cakman/game.fxml"));
             Pane gameRoot = loader.load();
 
-            // Replace scene root
             Scene scene = stage.getScene();
             scene.setRoot(gameRoot);
 
-            // Give control to GameController to start the game (countdown, spawn entities, input handling)
             GameController controller = loader.getController();
             if (controller != null) controller.startGame(stage);
         } catch (Exception e) {
@@ -80,8 +75,8 @@ public class MainMenuController {
 
     //TODO: Audio Manager
     private boolean isMuted = false;
-    private Image imgMusicOn = new Image(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/button/music_on.png"));
-    private Image imgMusicOff = new Image(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/button/music_off.png"));
+    private final Image imgMusicOn = new Image(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/button/music_on.png"));
+    private final Image imgMusicOff = new Image(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/button/music_off.png"));
 
     @FXML
     private void onMusicClick() {

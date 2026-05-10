@@ -11,6 +11,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import tech.cumlaude.cakman.cakman.entity.CakMan;
@@ -27,15 +28,21 @@ public class GameController {
 	@FXML
 	private Label lblCountdown;
 
+	@FXML
+	private Label lblScore;
+
 	private static final double MOVE_SPEED_PX_PER_SEC = 104.0;
 	private static final double ALIGN_EPSILON_PX = 0.75;
 	private static final double TURN_WINDOW_PX = 6.0;
+	private static final int PELLET_SCORE = 10;
 
 	private CakMan cakman;
 	private Image imgUp;
 	private Image imgDown;
 	private Image imgRight;
 	private ImageView cakmanView;
+	private boolean[][] pelletCells;
+	private int score;
 
 	private long lastNowNanos = 0L;
 
@@ -69,6 +76,8 @@ public class GameController {
 	}
 
 	private void spawnCakman() {
+		initializePellets();
+		score = 0;
 		int gridX = 13;
 		int gridY = 21;
 		cakman = new CakMan(gridX, gridY, MOVE_SPEED_PX_PER_SEC);
@@ -86,6 +95,8 @@ public class GameController {
 		cakmanView.setFitHeight(MapData.ENTITY_SIZE);
 		mazeContainer.getChildren().add(cakmanView);
 		updateModelAndSpriteAtCell(currentCellX, currentCellY);
+		updateScoreLabel();
+		consumePelletAtCell(currentCellX, currentCellY);
 	}
 
 	private void updateModelAndSpriteAtCell(int cellX, int cellY) {
@@ -93,6 +104,51 @@ public class GameController {
 		cakman.setPosition(cellX * MapData.TILE_SIZE, cellY * MapData.TILE_SIZE);
 		cakmanView.setLayoutX(cakman.getX() - MapData.ENTITY_OFFSET);
 		cakmanView.setLayoutY(cakman.getY() - MapData.ENTITY_OFFSET);
+	}
+
+	private void initializePellets() {
+		int rows = MapData.LEVEL_1.length;
+		int cols = MapData.LEVEL_1[0].length;
+		pelletCells = new boolean[rows][cols];
+		for (int row = 0; row < rows; row++) {
+			for (int col = 0; col < cols; col++) {
+				pelletCells[row][col] = MapData.LEVEL_1[row][col] == 60;
+			}
+		}
+	}
+
+	private void updateScoreLabel() {
+		if (lblScore != null) {
+			lblScore.setText("Score: " + score);
+		}
+	}
+
+	private void consumePelletAtCell(int cellX, int cellY) {
+		if (!hasPelletAtCell(cellX, cellY)) {
+			return;
+		}
+
+		pelletCells[cellY][cellX] = false;
+		score += PELLET_SCORE;
+		updateScoreLabel();
+		removePelletNode(cellX, cellY);
+	}
+
+	private boolean hasPelletAtCell(int cellX, int cellY) {
+		return pelletCells != null
+				&& cellY >= 0 && cellY < pelletCells.length
+				&& cellX >= 0 && cellX < pelletCells[cellY].length
+				&& pelletCells[cellY][cellX];
+	}
+
+	private void removePelletNode(int cellX, int cellY) {
+		if (mazeContainer == null) return;
+
+		double centerX = cellX * MapData.TILE_SIZE + MapData.TILE_SIZE / 2.0;
+		double centerY = cellY * MapData.TILE_SIZE + MapData.TILE_SIZE / 2.0;
+		mazeContainer.getChildren().removeIf(node -> node instanceof Circle circle
+				&& Math.abs(circle.getCenterX() - centerX) <= 0.1
+				&& Math.abs(circle.getCenterY() - centerY) <= 0.1);
 	}
 
 	private void runCountdownThenStart(Stage stage) {
@@ -205,6 +261,7 @@ public class GameController {
 			currentCellX = targetCellX;
 			currentCellY = targetCellY;
 			updateModelAndSpriteAtCell(currentCellX, currentCellY);
+			consumePelletAtCell(currentCellX, currentCellY);
 
 			Entity.Direction nextDirection = chooseNextDirection();
 

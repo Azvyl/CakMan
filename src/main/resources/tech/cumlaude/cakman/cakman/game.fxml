@@ -16,7 +16,8 @@
             <Pane fx:id="mazeContainer" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="728.0" prefWidth="728.0" />
          </children>
       </VBox>
+      <Label fx:id="lblScore" text="Score: 0" StackPane.alignment="TOP_LEFT" style="-fx-font-size:24px; -fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.9) , 6,0,0,1);" />
       <!-- Countdown label overlayed on top of the maze. Visible during pre-game countdown -->
-      <Label fx:id="lblCountdown" text="" StackPane.alignment="CENTER" style="-fx-font-size:72px; -fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.9) , 8,0,0,2);" />
+      <Label fx:id="lblCountdown" StackPane.alignment="CENTER" style="-fx-font-size:72px; -fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.9) , 8,0,0,2);" />
    </children>
 </StackPane>
