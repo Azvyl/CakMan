@@ -10,8 +10,8 @@ import java.util.Objects;
 public class MapRenderer {
     private final Pane mazeContainer;
 
-    private Image outStraight, outCorner, outBranch;
-    private Image inStraight, inEnd, inFull, inBranch;
+    private Image frameStraight, frameCorner, frameBranch;
+    private Image straight, corner1, corner2, full;
     private Image empty;
 
     public MapRenderer(Pane mazeContainer) {
@@ -21,14 +21,14 @@ public class MapRenderer {
 
     private void loadAssets() {
         try {
-            outStraight = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/outer_straight.png")));
-            outCorner = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/outer_corner.png")));
-            outBranch = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/outer_branch.png")));
+            frameStraight = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/frame_straight.png")));
+            frameCorner = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/frame_corner.png")));
+            frameBranch = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/frame_branch.png")));
 
-            inStraight = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/inner_straight.png")));
-            inEnd = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/inner_end.png")));
-            inFull = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/inner_full.png")));
-            inBranch = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/inner_branch.png")));
+            straight = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/straight.png")));
+            corner1 = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/corner_1.png")));
+            corner2 = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/corner_2.png")));
+            full = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/wall/full.png")));
 
             //TODO: thin wall untuk base ghost
 
@@ -58,48 +58,48 @@ public class MapRenderer {
             case 1 -> draw(x, y, empty, 0, false);
 
             // --- WALL LUAR ---
-            case 11 -> draw(x, y, outStraight, 0, false);
-            case 12 -> draw(x, y, outStraight, 90, false);
-            case 13 -> draw(x, y, outStraight, 180, false);
-            case 14 -> draw(x, y, outStraight, 270, false);
+            case 11 -> draw(x, y, frameStraight, 0, false);
+            case 12 -> draw(x, y, frameStraight, 90, false);
+            case 13 -> draw(x, y, frameStraight, 180, false);
+            case 14 -> draw(x, y, frameStraight, 270, false);
 
-            case 15 -> draw(x, y, outCorner, 0, false);
-            case 16 -> draw(x, y, outCorner, 90, false);
-            case 17 -> draw(x, y, outCorner, 180, false);
-            case 18 -> draw(x, y, outCorner, 270, false);
+            case 15 -> draw(x, y, frameCorner, 0, false);
+            case 16 -> draw(x, y, frameCorner, 90, false);
+            case 17 -> draw(x, y, frameCorner, 180, false);
+            case 18 -> draw(x, y, frameCorner, 270, false);
 
-            case 19 -> draw(x, y, outBranch, 0, false);
-            case 20 -> draw(x, y, outBranch, 90, false);
-            case 21 -> draw(x, y, outBranch, 180, false);
-            case 22 -> draw(x, y, outBranch, 270, false);
+            case 19 -> draw(x, y, frameBranch, 0, false);
+            case 20 -> draw(x, y, frameBranch, 90, false);
+            case 21 -> draw(x, y, frameBranch, 180, false);
+            case 22 -> draw(x, y, frameBranch, 270, false);
 
-            case 23 -> draw(x, y, outBranch, 0, true);
-            case 24 -> draw(x, y, outBranch, 90, true);
-            case 25 -> draw(x, y, outBranch, 180, true);
-            case 26 -> draw(x, y, outBranch, 270, true);
+            case 23 -> draw(x, y, frameBranch, 0, true);
+            case 24 -> draw(x, y, frameBranch, 90, true);
+            case 25 -> draw(x, y, frameBranch, 180, true);
+            case 26 -> draw(x, y, frameBranch, 270, true);
 
             // --- WALL DALAM ---
-            case 31 -> draw(x, y, inStraight, 0, false);
-            case 32 -> draw(x, y, inStraight, 90, false);
-            case 33 -> draw(x, y, inStraight, 180, false);
-            case 34 -> draw(x, y, inStraight, 270, false);
+            case 31 -> draw(x, y, straight, 0, false);
+            case 32 -> draw(x, y, straight, 90, false);
+            case 33 -> draw(x, y, straight, 180, false);
+            case 34 -> draw(x, y, straight, 270, false);
 
-            case 35 -> draw(x, y, inEnd, 0, false);
-            case 36 -> draw(x, y, inEnd, 90, false);
-            case 37 -> draw(x, y, inEnd, 180, false);
-            case 38 -> draw(x, y, inEnd, 270, false);
+            case 35 -> draw(x, y, corner2, 0, false);
+            case 36 -> draw(x, y, corner2, 90, false);
+            case 37 -> draw(x, y, corner2, 180, false);
+            case 38 -> draw(x, y, corner2, 270, false);
 
-            case 39 -> draw(x, y, inEnd, 0, true);
-            case 40 -> draw(x, y, inEnd, 90, true);
-            case 41 -> draw(x, y, inEnd, 180, true);
-            case 42 -> draw(x, y, inEnd, 270, true);
+            case 39 -> draw(x, y, corner2, 0, true);
+            case 40 -> draw(x, y, corner2, 90, true);
+            case 41 -> draw(x, y, corner2, 180, true);
+            case 42 -> draw(x, y, corner2, 270, true);
 
-            case 43 -> draw(x, y, inFull, 0, false);
+            case 43 -> draw(x, y, full, 0, false);
 
-            case 44 -> draw(x, y, inBranch, 0, false);
-            case 45 -> draw(x, y, inBranch, 90, false);
-            case 46 -> draw(x, y, inBranch, 180, false);
-            case 47 -> draw(x, y, inBranch, 270, false);
+            case 44 -> draw(x, y, corner1, 0, false);
+            case 45 -> draw(x, y, corner1, 90, false);
+            case 46 -> draw(x, y, corner1, 180, false);
+            case 47 -> draw(x, y, corner1, 270, false);
 
             // --- ITEMS ---
             case 60 -> drawPellet(x, y);

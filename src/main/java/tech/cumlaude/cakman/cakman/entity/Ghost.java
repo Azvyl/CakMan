@@ -57,15 +57,15 @@ public class Ghost extends Entity {
     }
 
     public enum Type {
-        AMERIKA,
-        BELANDA,
-        JEPANG;
+        USA,
+        DUTCH,
+        JAPAN;
 
         public String getImagePath() {
             return switch (this) {
-                case AMERIKA -> "/tech/cumlaude/cakman/cakman/images/ghost/amerika";
-                case BELANDA -> "/tech/cumlaude/cakman/cakman/images/ghost/belanda";
-                case JEPANG -> "/tech/cumlaude/cakman/cakman/images/ghost/jepang";
+                case USA -> "/tech/cumlaude/cakman/cakman/images/ghost/usa";
+                case DUTCH -> "/tech/cumlaude/cakman/cakman/images/ghost/dutch";
+                case JAPAN -> "/tech/cumlaude/cakman/cakman/images/ghost/japan";
             };
         }
     }
