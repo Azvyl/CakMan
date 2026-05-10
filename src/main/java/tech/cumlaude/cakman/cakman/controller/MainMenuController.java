@@ -56,13 +56,18 @@ public class MainMenuController {
     private void onPlayClick() {
         try {
             Stage stage = (Stage) btnPlay.getScene().getWindow();
-            Scene scene = stage.getScene();
 
-            Pane gameRoot = javafx.fxml.FXMLLoader.load(getClass().getResource("/tech/cumlaude/cakman/cakman/game.fxml"));
+            // Use FXMLLoader instance so we can get the controller and call startGame
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/tech/cumlaude/cakman/cakman/game.fxml"));
+            Pane gameRoot = loader.load();
+
+            // Replace scene root
+            Scene scene = stage.getScene();
             scene.setRoot(gameRoot);
 
-            MapRenderer renderer = new MapRenderer((Pane) gameRoot.lookup("#mazeContainer"));
-            renderer.render();
+            // Give control to GameController to start the game (countdown, spawn entities, input handling)
+            GameController controller = loader.getController();
+            if (controller != null) controller.startGame(stage);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -2,8 +2,9 @@
 
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tech.cumlaude.cakman.cakman.controller.GameController">
    <children>
       <ImageView fitHeight="1024.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true">
          <image>
@@ -15,5 +16,7 @@
             <Pane fx:id="mazeContainer" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="728.0" prefWidth="728.0" />
          </children>
       </VBox>
+      <!-- Countdown label overlayed on top of the maze. Visible during pre-game countdown -->
+      <Label fx:id="lblCountdown" text="" StackPane.alignment="CENTER" style="-fx-font-size:72px; -fx-text-fill: white; -fx-font-weight: bold; -fx-effect: dropshadow( gaussian , rgba(0,0,0,0.9) , 8,0,0,2);" />
    </children>
 </StackPane>

@@ -53,7 +53,8 @@ public class CakMan extends Entity {
 
     @Override
     public void move() {
-        //TODO
+        // Movement is managed by GameController in this simplified implementation.
+        // Keep method no-op to satisfy abstract contract.
     }
 
     @Override
