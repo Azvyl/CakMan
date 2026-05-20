@@ -11,6 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class AudioManager {
     public static final String MENU_MUSIC = "/tech/cumlaude/cakman/cakman/musics/main-1.mp3";
     public static final String GAME_MUSIC = "/tech/cumlaude/cakman/cakman/musics/game-1.mp3";
+    public static final String SFX_COLLECT = "/tech/cumlaude/cakman/cakman/sfx/collect_coin.mp3";
+    public static final String SFX_COLLIDE_GHOST = "/tech/cumlaude/cakman/cakman/sfx/collide_ghost.mp3";
+    public static final String SFX_GAME_OVER = "/tech/cumlaude/cakman/cakman/sfx/game_over.mp3";
 
     private static final AudioManager INSTANCE = new AudioManager();
 
@@ -133,6 +136,10 @@ public final class AudioManager {
         if (musicPlayer != null) {
             musicPlayer.setVolume(this.musicVolume);
         }
+    }
+
+    public synchronized double getMusicVolume() {
+        return musicVolume;
     }
 
     public synchronized void setSoundEffectVolume(double soundEffectVolume) {

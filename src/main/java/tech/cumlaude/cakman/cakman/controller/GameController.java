@@ -82,6 +82,9 @@ public class GameController {
     // ─── Ghost state ─────────────────────────────────────────────────────────
     private final List<GhostAgent> ghosts = new ArrayList<>();
     private Image imgFrightened;
+    // Audio restore flag when player collides with ghost (non-fatal)
+    private boolean restoreMusicWhenMoved = false;
+    private double previousMusicVolume = 0.55;
 
     // ─── Game state ──────────────────────────────────────────────────────────
     private AnimationTimer gameLoop;
@@ -270,6 +273,8 @@ public class GameController {
         pelletGrid[cy][cx] = false;
         score += PELLET_SCORE;
         updateHUD();
+        // play pellet collect SFX
+        try { AudioManager.getInstance().playSoundEffect(AudioManager.SFX_COLLECT); } catch (Exception ignored) {}
         removePelletCircle(cx, cy);
         checkVictory();
     }
@@ -313,6 +318,13 @@ public class GameController {
 
     private void triggerGameOver() {
         gameOver = true;
+        // stop music and play game over SFX
+        try {
+            AudioManager am = AudioManager.getInstance();
+            am.stopCurrentMusic();
+            am.playSoundEffect(AudioManager.SFX_GAME_OVER);
+        } catch (Exception ignored) {}
+        restoreMusicWhenMoved = false;
         stopLoop();
         showEndOverlay(false);
     }
@@ -548,6 +560,13 @@ public class GameController {
 
     private void startMoving(Entity.Direction dir) {
         if (!canStep(curX, curY, dir)) { stopCakman(); return; }
+        // If we need to restore music volume after a collision, do it when movement resumes
+        if (restoreMusicWhenMoved) {
+            try {
+                AudioManager.getInstance().setMusicVolume(previousMusicVolume);
+            } catch (Exception ignored) {}
+            restoreMusicWhenMoved = false;
+        }
         activeDir = dir; moving = true; movePx = 0;
         if (requestedDir == dir) { requestedDir = null; cakman.clearRequestedDirection(); }
         updateCakmanSprite(dir);
@@ -628,6 +647,16 @@ public class GameController {
                     ga.view.setVisible(true);
                     ga.releaseDelayFrames = 120;
                 } else {
+                    // non-fatal collision: temporarily mute music, play collide SFX,
+                    // then mark to restore when CakMan moves again
+                    try {
+                        AudioManager am = AudioManager.getInstance();
+                        previousMusicVolume = am.getMusicVolume();
+                        am.setMusicVolume(0.0);
+                        am.playSoundEffect(AudioManager.SFX_COLLIDE_GHOST);
+                        restoreMusicWhenMoved = true;
+                    } catch (Exception ignored) {}
+
                     loseLife();
                     return;
                 }
