@@ -101,6 +101,18 @@ public class MapRenderer {
             case 46 -> draw(x, y, corner1, 180, false);
             case 47 -> draw(x, y, corner1, 270, false);
 
+            case 50 -> draw(x, y, frameCorner, 0, false);
+            case 51 -> draw(x, y, frameCorner, 90, false);
+            case 52 -> draw(x, y, frameCorner, 180, false);
+            case 53 -> draw(x, y, frameCorner, 270, false);
+
+            case 54 -> draw(x, y, frameStraight, 0, false);
+            case 55 -> draw(x, y, frameStraight, 90, false);
+            case 56 -> draw(x, y, frameStraight, 180, false);
+            case 57 -> draw(x, y, frameStraight, 270, false);
+
+            case 58 -> draw(x, y, corner2, 0, false);
+
             // --- ITEMS ---
             case 60 -> drawPellet(x, y);
         }
