@@ -8,18 +8,45 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import tech.cumlaude.cakman.cakman.manager.AudioManager;
+
+import java.net.URL;
 
 public class MainMenuController {
     @FXML
     private Button btnPlay, btnScore, btnExit, btnMusic;
 
+    private Image imgMusicOn;
+    private Image imgMusicOff;
+
     @FXML
     public void initialize() {
         Button[] buttons = {btnPlay, btnScore, btnExit, btnMusic};
 
+        imgMusicOn = loadImage("/tech/cumlaude/cakman/cakman/images/button/music_on.png");
+        imgMusicOff = loadImage("/tech/cumlaude/cakman/cakman/images/button/music_off.png");
+
         for (Button b : buttons) {
             if (b != null) addHoverEffect(b);
         }
+
+        AudioManager audioManager = AudioManager.getInstance();
+        audioManager.playMenuMusic();
+        updateMusicButtonIcon(audioManager.isMusicEnabled());
+    }
+
+    private void updateMusicButtonIcon(boolean musicEnabled) {
+        if (btnMusic == null || btnMusic.getGraphic() == null || imgMusicOn == null || imgMusicOff == null) {
+            return;
+        }
+
+        ImageView view = (ImageView) btnMusic.getGraphic();
+        view.setImage(musicEnabled ? imgMusicOn : imgMusicOff);
+    }
+
+    private Image loadImage(String path) {
+        URL url = getClass().getResource(path);
+        return url == null ? null : new Image(url.toExternalForm());
     }
 
     private void addHoverEffect(Button button) {
@@ -38,7 +65,6 @@ public class MainMenuController {
             button.setEffect(null);
         });
 
-        //TODO: Audio Feedback
         button.setOnMousePressed(_ -> {
             button.setScaleX(0.9);
             button.setScaleY(0.9);
@@ -64,7 +90,7 @@ public class MainMenuController {
             GameController controller = loader.getController();
             if (controller != null) controller.startGame(stage);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Failed to open game scene: " + e.getMessage());
         }
     }
 
@@ -73,15 +99,10 @@ public class MainMenuController {
         System.exit(0);
     }
 
-    //TODO: Audio Manager
-    private boolean isMuted = false;
-    private final Image imgMusicOn = new Image(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/button/music_on.png"));
-    private final Image imgMusicOff = new Image(getClass().getResourceAsStream("/tech/cumlaude/cakman/cakman/images/button/music_off.png"));
-
     @FXML
     private void onMusicClick() {
-        isMuted = !isMuted;
-        ImageView view = (ImageView) btnMusic.getGraphic();
-        view.setImage(isMuted ? imgMusicOff : imgMusicOn);
+        AudioManager audioManager = AudioManager.getInstance();
+        audioManager.toggleMusic();
+        updateMusicButtonIcon(audioManager.isMusicEnabled());
     }
 }

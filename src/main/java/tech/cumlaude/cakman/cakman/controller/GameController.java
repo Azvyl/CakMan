@@ -23,6 +23,7 @@ import javafx.util.Duration;
 import tech.cumlaude.cakman.cakman.entity.CakMan;
 import tech.cumlaude.cakman.cakman.entity.Entity;
 import tech.cumlaude.cakman.cakman.entity.Ghost;
+import tech.cumlaude.cakman.cakman.manager.AudioManager;
 import tech.cumlaude.cakman.cakman.world.MapData;
 import tech.cumlaude.cakman.cakman.world.MapRenderer;
 
@@ -97,6 +98,7 @@ public class GameController {
     public void startGame(Stage stage) {
         this.gameStage = stage;
         new MapRenderer(mazeContainer).render();
+        AudioManager.getInstance().playGameMusic();
         loadCakmanAssets();
         loadGhostAssets();
         spawnCakman();
