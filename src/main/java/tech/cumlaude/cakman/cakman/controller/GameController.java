@@ -3,6 +3,7 @@ package tech.cumlaude.cakman.cakman.controller;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -24,6 +25,8 @@ import tech.cumlaude.cakman.cakman.entity.CakMan;
 import tech.cumlaude.cakman.cakman.entity.Entity;
 import tech.cumlaude.cakman.cakman.entity.Ghost;
 import tech.cumlaude.cakman.cakman.manager.AudioManager;
+import tech.cumlaude.cakman.cakman.manager.DatabaseManager;
+import tech.cumlaude.cakman.cakman.manager.HighScoreEntry;
 import tech.cumlaude.cakman.cakman.world.MapData;
 import tech.cumlaude.cakman.cakman.world.MapRenderer;
 
@@ -94,12 +97,31 @@ public class GameController {
     private boolean gameOver = false;
     private boolean victory  = false;
     private StackPane overlayPane;
+    private Timeline respawnTimeline;
+    private EventHandler<KeyEvent> keyInputHandler;
+    private final DatabaseManager databaseManager = new DatabaseManager();
+    private String playerName = "PLAYER";
+    private boolean scoreSaved = false;
 
     // =========================================================================
     //  ENTRY POINT
     // =========================================================================
     public void startGame(Stage stage) {
+        startGame(stage, "PLAYER");
+    }
+
+    public void startGame(Stage stage, String playerName) {
         this.gameStage = stage;
+        this.playerName = sanitizePlayerName(playerName);
+        this.scoreSaved = false;
+        this.paused = false;
+        this.gameOver = false;
+        this.victory = false;
+        this.restoreMusicWhenMoved = false;
+        if (respawnTimeline != null) {
+            respawnTimeline.stop();
+            respawnTimeline = null;
+        }
         new MapRenderer(mazeContainer).render();
         AudioManager.getInstance().playGameMusic();
         loadCakmanAssets();
@@ -184,7 +206,7 @@ public class GameController {
 
             GhostAgent ga = new GhostAgent(ghost, iv, gUp, gDown, gRight, gx, gy, initDir, i);
             // Ghost ke-2 dan ke-3 mulai dengan delay (mereka diam dulu)
-            ga.releaseDelayFrames = i * 120; // 120 frame ≈ 2 detik per ghost
+            // ga.releaseDelayFrames = i * 120; // 120 frame ≈ 2 detik per ghost
             ghosts.add(ga);
         }
     }
@@ -238,6 +260,7 @@ public class GameController {
     }
 
     private void checkPowerPellet(int cx, int cy) {
+        if (paused || gameOver || victory) return;
         for (int i = 0; i < POWER_PELLET_POS.length; i++) {
             if (!powerActive[i]) continue;
             if (cx != POWER_PELLET_POS[i][1] || cy != POWER_PELLET_POS[i][0]) continue;
@@ -250,6 +273,7 @@ public class GameController {
 
             long now = System.nanoTime();
             cakman.activateSuperMode(now, FRIGHTEN_MS);
+            AudioManager.getInstance().playSoundEffect(AudioManager.SFX_POWER_PELLET);
 
             for (GhostAgent ga : ghosts) {
                 if (ga.active) ga.ghost.frighten(now, FRIGHTEN_MS);
@@ -269,6 +293,7 @@ public class GameController {
     }
 
     private void consumePellet(int cx, int cy) {
+        if (paused || gameOver || victory) return;
         if (!hasPellet(cx, cy)) return;
         pelletGrid[cy][cx] = false;
         score += PELLET_SCORE;
@@ -309,22 +334,34 @@ public class GameController {
     //  VICTORY / GAME OVER
     // =========================================================================
     private void checkVictory() {
+        if (victory || gameOver) return;
         for (boolean[] row : pelletGrid)
             for (boolean v : row) if (v) return;
         victory = true;
+        saveScoreIfNeeded();
+        try {
+            AudioManager am = AudioManager.getInstance();
+            am.stopCurrentMusic();
+            am.playSoundEffect(AudioManager.SFX_VICTORY);
+        } catch (Exception ignored) {}
         stopLoop();
         showEndOverlay(true);
     }
 
     private void triggerGameOver() {
+        if (gameOver) return;
         gameOver = true;
         // stop music and play game over SFX
         try {
             AudioManager am = AudioManager.getInstance();
+            if (restoreMusicWhenMoved) {
+                am.setMusicVolume(previousMusicVolume);
+            }
             am.stopCurrentMusic();
             am.playSoundEffect(AudioManager.SFX_GAME_OVER);
         } catch (Exception ignored) {}
         restoreMusicWhenMoved = false;
+        saveScoreIfNeeded();
         stopLoop();
         showEndOverlay(false);
     }
@@ -345,12 +382,24 @@ public class GameController {
         Label scoreLbl = new Label("Skor: " + score);
         scoreLbl.setStyle("-fx-font-size:28px; -fx-text-fill:white; -fx-font-weight:bold;");
 
+        Label playerLbl = new Label("Pemain: " + playerName);
+        playerLbl.setStyle("-fx-font-size:20px; -fx-text-fill:#d0d0ff;");
+
+        Label rankLbl = new Label(buildTopScoresText());
+        rankLbl.setStyle("-fx-font-size:15px; -fx-text-fill:#f2f2f2; -fx-background-color:rgba(0,0,0,0.25); -fx-padding:8 12 8 12; -fx-background-radius:6;");
+
         Button btnReplay = overlayBtn("▶  Main Lagi");
         Button btnMenu   = overlayBtn("🏠  Menu Utama");
-        btnReplay.setOnAction(_ -> restartGame());
-        btnMenu.setOnAction(_ -> goToMenu());
+        btnReplay.setOnAction(_ -> {
+            AudioManager.getInstance().playSoundEffect(AudioManager.SFX_BUTTON_CLICK);
+            restartGame();
+        });
+        btnMenu.setOnAction(_ -> {
+            AudioManager.getInstance().playSoundEffect(AudioManager.SFX_BUTTON_CLICK);
+            goToMenu();
+        });
 
-        addToOverlay(overlayPane, title, scoreLbl, btnReplay, btnMenu);
+        addToOverlay(overlayPane, title, scoreLbl, playerLbl, rankLbl, btnReplay, btnMenu);
     }
 
     private void showPauseOverlay() {
@@ -365,8 +414,14 @@ public class GameController {
 
         Button btnResume = overlayBtn("▶  Lanjutkan");
         Button btnMenu   = overlayBtn("🏠  Menu Utama");
-        btnResume.setOnAction(_ -> resumeGame());
-        btnMenu.setOnAction(_ -> goToMenu());
+        btnResume.setOnAction(_ -> {
+            AudioManager.getInstance().playSoundEffect(AudioManager.SFX_BUTTON_CLICK);
+            resumeGame();
+        });
+        btnMenu.setOnAction(_ -> {
+            AudioManager.getInstance().playSoundEffect(AudioManager.SFX_BUTTON_CLICK);
+            goToMenu();
+        });
 
         addToOverlay(overlayPane, title, hint, btnResume, btnMenu);
     }
@@ -409,15 +464,22 @@ public class GameController {
         if (gameOver || victory || paused) return;
         paused = true;
         stopLoop();
+        if (respawnTimeline != null) respawnTimeline.pause();
         showPauseOverlay();
     }
 
     private void resumeGame() {
-        if (!paused) return;
+        if (!paused || gameOver || victory) return;
         paused = false;
         removeOverlay();
-        lastNanos = 0L;
-        gameLoop.start();
+        if (respawnTimeline != null) {
+            respawnTimeline.play();
+            return;
+        }
+        if (gameLoop != null) {
+            lastNanos = 0L;
+            gameLoop.start();
+        }
     }
 
     // =========================================================================
@@ -426,6 +488,12 @@ public class GameController {
     private void goToMenu() {
         try {
             stopLoop();
+            detachInputHandler();
+            if (respawnTimeline != null) {
+                respawnTimeline.stop();
+                respawnTimeline = null;
+            }
+            restoreMusicVolumeIfNeeded();
             var loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/tech/cumlaude/cakman/cakman/main-menu.fxml"));
             gameStage.getScene().setRoot(loader.load());
@@ -435,12 +503,18 @@ public class GameController {
     private void restartGame() {
         try {
             stopLoop();
+            detachInputHandler();
+            if (respawnTimeline != null) {
+                respawnTimeline.stop();
+                respawnTimeline = null;
+            }
+            restoreMusicVolumeIfNeeded();
             var loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/tech/cumlaude/cakman/cakman/game.fxml"));
             javafx.scene.layout.Pane root = loader.load();
             gameStage.getScene().setRoot(root);
             GameController ctrl = loader.getController();
-            if (ctrl != null) ctrl.startGame(gameStage);
+            if (ctrl != null) ctrl.startGame(gameStage, playerName);
         } catch (Exception e) { e.printStackTrace(); }
     }
 
@@ -467,10 +541,14 @@ public class GameController {
 
     private void enableInput(Scene scene) {
         if (scene == null) return;
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, ev -> {
+        if (keyInputHandler != null) {
+            scene.removeEventFilter(KeyEvent.KEY_PRESSED, keyInputHandler);
+        }
+        keyInputHandler = ev -> {
             KeyCode code = ev.getCode();
             if (code == KeyCode.ESCAPE || code == KeyCode.P) {
                 if (paused) resumeGame(); else pauseGame();
+                ev.consume();
                 return;
             }
             if (paused || gameOver || victory) return;
@@ -479,7 +557,9 @@ public class GameController {
             requestedDir = dir;
             cakman.requestDirection(dir);
             if (!moving && canStep(curX, curY, dir)) startMoving(dir);
-        });
+            ev.consume();
+        };
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, keyInputHandler);
     }
 
     private Entity.Direction toDir(KeyCode code) {
@@ -498,6 +578,7 @@ public class GameController {
     private void startLoop() {
         gameLoop = new AnimationTimer() {
             @Override public void handle(long now) {
+                if (paused || gameOver || victory) return;
                 if (lastNanos == 0L) { lastNanos = now; return; }
                 double dt = (now - lastNanos) / 1e9;
                 lastNanos = now;
@@ -639,6 +720,7 @@ public class GameController {
                 if (ga.ghost.isFrightened()) {
                     score += GHOST_KILL_SCORE;
                     updateHUD();
+                    AudioManager.getInstance().playSoundEffect(AudioManager.SFX_EAT_GHOST);
                     int sx = GHOST_SPAWN[ga.index][0];
                     int sy = GHOST_SPAWN[ga.index][1];
 
@@ -665,12 +747,22 @@ public class GameController {
     }
 
     private void loseLife() {
+        if (paused || gameOver || victory) return;
         lives--;
         updateHUD();
         if (lives <= 0) { triggerGameOver(); return; }
         stopLoop();
         resetPositions();
-        new Timeline(new KeyFrame(Duration.seconds(1.5), e -> { lastNanos = 0L; gameLoop.start(); })).play();
+        if (respawnTimeline != null) {
+            respawnTimeline.stop();
+        }
+        respawnTimeline = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
+            respawnTimeline = null;
+            if (paused || gameOver || victory || gameLoop == null) return;
+            lastNanos = 0L;
+            gameLoop.start();
+        }));
+        respawnTimeline.play();
     }
 
     private void resetPositions() {
@@ -697,6 +789,61 @@ public class GameController {
 
     private double lerp(double a, double b, double t) { return a + (b - a) * t; }
     private double clamp01(double v) { return Math.max(0, Math.min(1, v)); }
+
+    private String sanitizePlayerName(String rawName) {
+        if (rawName == null) return "PLAYER";
+        String normalized = rawName.trim();
+        if (normalized.isEmpty()) return "PLAYER";
+        if (normalized.length() > 20) return normalized.substring(0, 20);
+        return normalized;
+    }
+
+    private void saveScoreIfNeeded() {
+        if (scoreSaved) return;
+        try {
+            databaseManager.saveHighScore(playerName, score);
+            scoreSaved = true;
+        } catch (Exception exception) {
+            System.err.println("Failed to save high score: " + exception.getMessage());
+        }
+    }
+
+    private String buildTopScoresText() {
+        try {
+            List<HighScoreEntry> entries = databaseManager.getTop5HighScores();
+            if (entries.isEmpty()) return "Top Score\nBelum ada data.";
+
+            StringBuilder sb = new StringBuilder("Top Score\n");
+            for (int i = 0; i < entries.size(); i++) {
+                HighScoreEntry entry = entries.get(i);
+                sb.append(i + 1)
+                        .append(". ")
+                        .append(entry.name())
+                        .append(" - ")
+                        .append(entry.score());
+                if (i < entries.size() - 1) sb.append("\n");
+            }
+            return sb.toString();
+        } catch (Exception exception) {
+            return "Top Score\nGagal memuat data.";
+        }
+    }
+
+    private void restoreMusicVolumeIfNeeded() {
+        if (!restoreMusicWhenMoved) return;
+        try {
+            AudioManager.getInstance().setMusicVolume(previousMusicVolume);
+        } catch (Exception ignored) {
+        }
+        restoreMusicWhenMoved = false;
+    }
+
+    private void detachInputHandler() {
+        if (gameScene != null && keyInputHandler != null) {
+            gameScene.removeEventFilter(KeyEvent.KEY_PRESSED, keyInputHandler);
+            keyInputHandler = null;
+        }
+    }
 
     // =========================================================================
     //  GhostAgent — inner class dengan AI menyebar + flee behaviour

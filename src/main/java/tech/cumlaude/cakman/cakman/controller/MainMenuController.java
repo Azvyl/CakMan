@@ -3,6 +3,7 @@ package tech.cumlaude.cakman.cakman.controller;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -15,6 +16,8 @@ import java.net.URL;
 public class MainMenuController {
     @FXML
     private Button btnPlay, btnScore, btnExit, btnMusic;
+    @FXML
+    private TextField txtPlayerName;
 
     private Image imgMusicOn;
     private Image imgMusicOff;
@@ -33,6 +36,10 @@ public class MainMenuController {
         AudioManager audioManager = AudioManager.getInstance();
         audioManager.playMenuMusic();
         updateMusicButtonIcon(audioManager.isMusicEnabled());
+
+        if (txtPlayerName != null) {
+            txtPlayerName.setText("PLAYER");
+        }
     }
 
     private void updateMusicButtonIcon(boolean musicEnabled) {
@@ -66,6 +73,7 @@ public class MainMenuController {
         });
 
         button.setOnMousePressed(_ -> {
+            AudioManager.getInstance().playSoundEffect(AudioManager.SFX_BUTTON_CLICK);
             button.setScaleX(0.9);
             button.setScaleY(0.9);
         });
@@ -88,10 +96,18 @@ public class MainMenuController {
             scene.setRoot(gameRoot);
 
             GameController controller = loader.getController();
-            if (controller != null) controller.startGame(stage);
+            if (controller != null) controller.startGame(stage, resolvePlayerName());
         } catch (Exception e) {
             System.err.println("Failed to open game scene: " + e.getMessage());
         }
+    }
+
+    private String resolvePlayerName() {
+        if (txtPlayerName == null || txtPlayerName.getText() == null) {
+            return "PLAYER";
+        }
+        String value = txtPlayerName.getText().trim();
+        return value.isEmpty() ? "PLAYER" : value;
     }
 
     @FXML

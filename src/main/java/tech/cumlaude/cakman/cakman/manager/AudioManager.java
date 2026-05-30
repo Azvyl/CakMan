@@ -13,7 +13,11 @@ public final class AudioManager {
     public static final String GAME_MUSIC = "/tech/cumlaude/cakman/cakman/musics/game-1.mp3";
     public static final String SFX_COLLECT = "/tech/cumlaude/cakman/cakman/sfx/collect_coin.mp3";
     public static final String SFX_COLLIDE_GHOST = "/tech/cumlaude/cakman/cakman/sfx/collide_ghost.mp3";
+    public static final String SFX_EAT_GHOST = "/tech/cumlaude/cakman/cakman/sfx/eat_ghost.mp3";
+    public static final String SFX_POWER_PELLET = "/tech/cumlaude/cakman/cakman/sfx/power_pellet.mp3";
     public static final String SFX_GAME_OVER = "/tech/cumlaude/cakman/cakman/sfx/game_over.mp3";
+    public static final String SFX_VICTORY = "/tech/cumlaude/cakman/cakman/sfx/victory.mp3";
+    public static final String SFX_BUTTON_CLICK = "/tech/cumlaude/cakman/cakman/sfx/button_clicked.mp3";
 
     private static final AudioManager INSTANCE = new AudioManager();
 
