@@ -35,27 +35,31 @@ import java.util.*;
 public class GameController {
 
     // ─── FXML ────────────────────────────────────────────────────────────────
-    @FXML private Pane  mazeContainer;
-    @FXML private Label lblCountdown;
-    @FXML private Label lblScore;
-    @FXML private Label lblLives;
+    @FXML
+    private Pane mazeContainer;
+    @FXML
+    private Label lblCountdown;
+    @FXML
+    private Label lblScore;
+    @FXML
+    private Label lblLives;
 
     // ─── Konstanta ───────────────────────────────────────────────────────────
-    private static final double CAKMAN_SPEED  = 105.0;
-    private static final double GHOST_SPEED   = 100.0;
+    private static final double CAKMAN_SPEED = 105.0;
+    private static final double GHOST_SPEED = 100.0;
     private static final double GHOST_FRIGHT_SPEED = 85.0;   // lambat saat ketakutan
-    private static final double ALIGN_EPS     = 0.75;
-    private static final double TURN_WINDOW   = 6.0;
+    private static final double ALIGN_EPS = 0.75;
+    private static final double TURN_WINDOW = 6.0;
 
     // Ukuran ghost = TILE_SIZE supaya muat di jalur
     private static final int GHOST_DISPLAY_SIZE = MapData.TILE_SIZE + 4; // 30px, sedikit lebih besar dari tile tapi tidak meluber
-    private static final int GHOST_OFFSET       = (GHOST_DISPLAY_SIZE - MapData.TILE_SIZE) / 2;
+    private static final int GHOST_OFFSET = (GHOST_DISPLAY_SIZE - MapData.TILE_SIZE) / 2;
 
-    private static final int PELLET_SCORE       = 10;
+    private static final int PELLET_SCORE = 10;
     private static final int POWER_PELLET_SCORE = 50;
-    private static final int GHOST_KILL_SCORE   = 200;
-    private static final int MAX_LIVES          = 3;
-    private static final long FRIGHTEN_MS       = 8_000L;
+    private static final int GHOST_KILL_SCORE = 200;
+    private static final int MAX_LIVES = 3;
+    private static final long FRIGHTEN_MS = 8_000L;
 
     // Power pellet [row][col] — 2 lokasi pojok kiri & kanan row 5
     private static final int[][] POWER_PELLET_POS = {{5, 1}, {5, 26}};
@@ -66,13 +70,13 @@ public class GameController {
     private static final String[] GHOST_DIRS = {"usa", "dutch", "japan"};
 
     // ─── CakMan state ────────────────────────────────────────────────────────
-    private CakMan   cakman;
+    private CakMan cakman;
     private ImageView cakmanView;
     private Image imgUp, imgDown, imgRight;
     private Image imgPowerUp, imgPowerDown, imgPowerRight;
 
     private boolean[][] pelletGrid;
-    private boolean[]   powerActive;
+    private boolean[] powerActive;
     private final List<javafx.scene.Node[]> powerNodes = new ArrayList<>();
 
     private int score, lives;
@@ -91,11 +95,11 @@ public class GameController {
 
     // ─── Game state ──────────────────────────────────────────────────────────
     private AnimationTimer gameLoop;
-    private Stage          gameStage;
-    private Scene          gameScene;
-    private boolean paused   = false;
+    private Stage gameStage;
+    private Scene gameScene;
+    private boolean paused = false;
     private boolean gameOver = false;
-    private boolean victory  = false;
+    private boolean victory = false;
     private StackPane overlayPane;
     private Timeline respawnTimeline;
     private EventHandler<KeyEvent> keyInputHandler;
@@ -136,12 +140,12 @@ public class GameController {
     //  ASSET LOADING
     // =========================================================================
     private void loadCakmanAssets() {
-        imgUp          = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/up.png");
-        imgDown        = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/down.png");
-        imgRight       = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/right.png");
-        imgPowerUp     = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/power_up.png");
-        imgPowerDown   = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/power_down.png");
-        imgPowerRight  = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/power_right.png");
+        imgUp = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/up.png");
+        imgDown = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/down.png");
+        imgRight = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/right.png");
+        imgPowerUp = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/power_up.png");
+        imgPowerDown = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/power_down.png");
+        imgPowerRight = img("/tech/cumlaude/cakman/cakman/images/entity/cakman/power_right.png");
     }
 
     private void loadGhostAssets() {
@@ -151,9 +155,15 @@ public class GameController {
     private Image img(String path) {
         try {
             var url = getClass().getResource(path);
-            if (url == null) { System.err.println("Missing: " + path); return null; }
+            if (url == null) {
+                System.err.println("Missing: " + path);
+                return null;
+            }
             return new Image(url.toExternalForm());
-        } catch (Exception e) { System.err.println("Error loading: " + path); return null; }
+        } catch (Exception e) {
+            System.err.println("Error loading: " + path);
+            return null;
+        }
     }
 
     // =========================================================================
@@ -161,11 +171,18 @@ public class GameController {
     // =========================================================================
     private void spawnCakman() {
         initPellets();
-        score = 0; lives = MAX_LIVES;
+        score = 0;
+        lives = MAX_LIVES;
         int gx = 13, gy = 21;
         cakman = new CakMan(gx, gy, CAKMAN_SPEED);
-        curX = gx; curY = gy; tgtX = gx; tgtY = gy;
-        activeDir = null; requestedDir = null; moving = false; movePx = 0;
+        curX = gx;
+        curY = gy;
+        tgtX = gx;
+        tgtY = gy;
+        activeDir = null;
+        requestedDir = null;
+        moving = false;
+        movePx = 0;
 
         cakmanView = new ImageView(imgRight);
         cakmanView.setFitWidth(MapData.ENTITY_SIZE);
@@ -184,8 +201,8 @@ public class GameController {
             int gx = GHOST_SPAWN[i][0], gy = GHOST_SPAWN[i][1];
             String type = GHOST_DIRS[i % GHOST_DIRS.length];
 
-            Image gUp    = img("/tech/cumlaude/cakman/cakman/images/entity/ghost/" + type + "/up.png");
-            Image gDown  = img("/tech/cumlaude/cakman/cakman/images/entity/ghost/" + type + "/down.png");
+            Image gUp = img("/tech/cumlaude/cakman/cakman/images/entity/ghost/" + type + "/up.png");
+            Image gDown = img("/tech/cumlaude/cakman/cakman/images/entity/ghost/" + type + "/down.png");
             Image gRight = img("/tech/cumlaude/cakman/cakman/images/entity/ghost/" + type + "/right.png");
 
             ImageView iv = new ImageView(gRight != null ? gRight : imgFrightened);
@@ -218,11 +235,11 @@ public class GameController {
         powerActive = new boolean[POWER_PELLET_POS.length];
         powerNodes.clear();
         String[] foodPaths = {
-            "/tech/cumlaude/cakman/cakman/images/entity/food/bakso.png",
-            "/tech/cumlaude/cakman/cakman/images/entity/food/mie_ayam.png"
+                "/tech/cumlaude/cakman/cakman/images/entity/food/bakso.png",
+                "/tech/cumlaude/cakman/cakman/images/entity/food/mie_ayam.png"
         };
         String[] labels = {"© Bakso", "© Mie Ayam"};
-        Color[] colors  = {Color.web("#FF6B35"), Color.web("#FFD700")};
+        Color[] colors = {Color.web("#FF6B35"), Color.web("#FFD700")};
 
         for (int i = 0; i < POWER_PELLET_POS.length; i++) {
             int row = POWER_PELLET_POS[i][0], col = POWER_PELLET_POS[i][1];
@@ -239,20 +256,24 @@ public class GameController {
             javafx.scene.Node foodNode;
             if (foodImg != null) {
                 ImageView iv = new ImageView(foodImg);
-                iv.setFitWidth(22); iv.setFitHeight(22);
-                iv.setLayoutX(cx - 11); iv.setLayoutY(cy - 11);
+                iv.setFitWidth(22);
+                iv.setFitHeight(22);
+                iv.setLayoutX(cx - 11);
+                iv.setLayoutY(cy - 11);
                 foodNode = iv;
             } else {
                 // Fallback lingkaran berwarna
                 Circle c = new Circle(cx, cy, 9, colors[i]);
-                c.setStroke(Color.WHITE); c.setStrokeWidth(1.5);
+                c.setStroke(Color.WHITE);
+                c.setStrokeWidth(1.5);
                 foodNode = c;
             }
 
             // Label kecil
             Label lbl = new Label(labels[i]);
             lbl.setStyle("-fx-font-size:7px; -fx-text-fill:white; -fx-font-weight:bold;");
-            lbl.setLayoutX(cx - 16); lbl.setLayoutY(cy + 11);
+            lbl.setLayoutX(cx - 16);
+            lbl.setLayoutY(cy + 11);
 
             mazeContainer.getChildren().addAll(glow, foodNode, lbl);
             powerNodes.add(new javafx.scene.Node[]{glow, foodNode, lbl});
@@ -299,7 +320,10 @@ public class GameController {
         score += PELLET_SCORE;
         updateHUD();
         // play pellet collect SFX
-        try { AudioManager.getInstance().playSoundEffect(AudioManager.SFX_COLLECT); } catch (Exception ignored) {}
+        try {
+            AudioManager.getInstance().playSoundEffect(AudioManager.SFX_COLLECT);
+        } catch (Exception ignored) {
+        }
         removePelletCircle(cx, cy);
         checkVictory();
     }
@@ -313,9 +337,9 @@ public class GameController {
         double px = cx * MapData.TILE_SIZE + MapData.TILE_SIZE / 2.0;
         double py = cy * MapData.TILE_SIZE + MapData.TILE_SIZE / 2.0;
         mazeContainer.getChildren().removeIf(n ->
-            n instanceof Circle c && c.getRadius() <= 4
-            && Math.abs(c.getCenterX() - px) <= 0.2
-            && Math.abs(c.getCenterY() - py) <= 0.2);
+                n instanceof Circle c && c.getRadius() <= 4
+                        && Math.abs(c.getCenterX() - px) <= 0.2
+                        && Math.abs(c.getCenterY() - py) <= 0.2);
     }
 
     // =========================================================================
@@ -343,7 +367,8 @@ public class GameController {
             AudioManager am = AudioManager.getInstance();
             am.stopCurrentMusic();
             am.playSoundEffect(AudioManager.SFX_VICTORY);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         stopLoop();
         showEndOverlay(true);
     }
@@ -359,14 +384,17 @@ public class GameController {
             }
             am.stopCurrentMusic();
             am.playSoundEffect(AudioManager.SFX_GAME_OVER);
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         restoreMusicWhenMoved = false;
         saveScoreIfNeeded();
         stopLoop();
         showEndOverlay(false);
     }
 
-    private void stopLoop() { if (gameLoop != null) gameLoop.stop(); }
+    private void stopLoop() {
+        if (gameLoop != null) gameLoop.stop();
+    }
 
     // =========================================================================
     //  OVERLAYS
@@ -385,11 +413,8 @@ public class GameController {
         Label playerLbl = new Label("Pemain: " + playerName);
         playerLbl.setStyle("-fx-font-size:20px; -fx-text-fill:#d0d0ff;");
 
-        Label rankLbl = new Label(buildTopScoresText());
-        rankLbl.setStyle("-fx-font-size:15px; -fx-text-fill:#f2f2f2; -fx-background-color:rgba(0,0,0,0.25); -fx-padding:8 12 8 12; -fx-background-radius:6;");
-
         Button btnReplay = overlayBtn("▶  Main Lagi");
-        Button btnMenu   = overlayBtn("🏠  Menu Utama");
+        Button btnMenu = overlayBtn("🏠  Menu Utama");
         btnReplay.setOnAction(_ -> {
             AudioManager.getInstance().playSoundEffect(AudioManager.SFX_BUTTON_CLICK);
             restartGame();
@@ -399,7 +424,7 @@ public class GameController {
             goToMenu();
         });
 
-        addToOverlay(overlayPane, title, scoreLbl, playerLbl, rankLbl, btnReplay, btnMenu);
+        addToOverlay(overlayPane, title, scoreLbl, playerLbl, btnReplay, btnMenu);
     }
 
     private void showPauseOverlay() {
@@ -413,7 +438,7 @@ public class GameController {
         hint.setStyle("-fx-font-size:16px; -fx-text-fill:#aaaaff;");
 
         Button btnResume = overlayBtn("▶  Lanjutkan");
-        Button btnMenu   = overlayBtn("🏠  Menu Utama");
+        Button btnMenu = overlayBtn("🏠  Menu Utama");
         btnResume.setOnAction(_ -> {
             AudioManager.getInstance().playSoundEffect(AudioManager.SFX_BUTTON_CLICK);
             resumeGame();
@@ -428,10 +453,15 @@ public class GameController {
 
     private StackPane buildOverlay(Color bg) {
         StackPane sp = new StackPane();
-        sp.setPrefSize(728, 728);
-        Rectangle rect = new Rectangle(728, 728, bg);
+        sp.setPrefSize(1024, 1024);
+        sp.setMaxSize(1024, 1024);
+        Rectangle rect = new Rectangle(1024, 1024, bg);
         sp.getChildren().add(rect);
-        mazeContainer.getChildren().add(sp);
+        if (gameScene != null && gameScene.getRoot() instanceof Pane root) {
+            root.getChildren().add(sp);
+        } else {
+            mazeContainer.getChildren().add(sp);
+        }
         return sp;
     }
 
@@ -449,12 +479,18 @@ public class GameController {
                 + "-fx-border-radius:8;-fx-background-radius:8;-fx-padding:10 30 10 30;-fx-cursor:hand;";
         b.setStyle(base);
         b.setOnMouseEntered(_ -> b.setStyle(base + "-fx-background-color:#2a2a9e;"));
-        b.setOnMouseExited(_  -> b.setStyle(base));
+        b.setOnMouseExited(_ -> b.setStyle(base));
         return b;
     }
 
     private void removeOverlay() {
-        if (overlayPane != null) { mazeContainer.getChildren().remove(overlayPane); overlayPane = null; }
+        if (overlayPane != null) {
+            mazeContainer.getChildren().remove(overlayPane);
+            if (gameScene != null && gameScene.getRoot() instanceof Pane root) {
+                root.getChildren().remove(overlayPane);
+            }
+            overlayPane = null;
+        }
     }
 
     // =========================================================================
@@ -497,7 +533,9 @@ public class GameController {
             var loader = new javafx.fxml.FXMLLoader(
                     getClass().getResource("/tech/cumlaude/cakman/cakman/main-menu.fxml"));
             gameStage.getScene().setRoot(loader.load());
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void restartGame() {
@@ -515,7 +553,9 @@ public class GameController {
             gameStage.getScene().setRoot(root);
             GameController ctrl = loader.getController();
             if (ctrl != null) ctrl.startGame(gameStage, playerName);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // =========================================================================
@@ -547,7 +587,8 @@ public class GameController {
         keyInputHandler = ev -> {
             KeyCode code = ev.getCode();
             if (code == KeyCode.ESCAPE || code == KeyCode.P) {
-                if (paused) resumeGame(); else pauseGame();
+                if (paused) resumeGame();
+                else pauseGame();
                 ev.consume();
                 return;
             }
@@ -565,9 +606,9 @@ public class GameController {
     private Entity.Direction toDir(KeyCode code) {
         return switch (code) {
             case RIGHT, D -> Entity.Direction.RIGHT;
-            case LEFT,  A -> Entity.Direction.LEFT;
-            case UP,    W -> Entity.Direction.UP;
-            case DOWN,  S -> Entity.Direction.DOWN;
+            case LEFT, A -> Entity.Direction.LEFT;
+            case UP, W -> Entity.Direction.UP;
+            case DOWN, S -> Entity.Direction.DOWN;
             default -> null;
         };
     }
@@ -577,9 +618,13 @@ public class GameController {
     // =========================================================================
     private void startLoop() {
         gameLoop = new AnimationTimer() {
-            @Override public void handle(long now) {
+            @Override
+            public void handle(long now) {
                 if (paused || gameOver || victory) return;
-                if (lastNanos == 0L) { lastNanos = now; return; }
+                if (lastNanos == 0L) {
+                    lastNanos = now;
+                    return;
+                }
                 double dt = (now - lastNanos) / 1e9;
                 lastNanos = now;
                 cakman.update(now);
@@ -598,22 +643,30 @@ public class GameController {
         if (cakman == null) return;
         if (!moving) {
             if (requestedDir != null && canStep(curX, curY, requestedDir)) startMoving(requestedDir);
-            else { snapCakmanToCell(curX, curY); return; }
+            else {
+                snapCakmanToCell(curX, curY);
+                return;
+            }
         }
         if (requestedDir != null && requestedDir == activeDir) {
-            requestedDir = null; cakman.clearRequestedDirection();
+            requestedDir = null;
+            cakman.clearRequestedDirection();
         }
         movePx += cakman.getSpeed() * dt;
         if (shouldSnap()) movePx = MapData.TILE_SIZE;
 
         while (moving && movePx >= MapData.TILE_SIZE) {
             movePx -= MapData.TILE_SIZE;
-            curX = tgtX; curY = tgtY;
+            curX = tgtX;
+            curY = tgtY;
             snapCakmanToCell(curX, curY);
             consumePellet(curX, curY);
             checkPowerPellet(curX, curY);
             Entity.Direction next = pickNextDir();
-            if (next == null || !canStep(curX, curY, next)) { stopCakman(); return; }
+            if (next == null || !canStep(curX, curY, next)) {
+                stopCakman();
+                return;
+            }
             startMoving(next);
         }
         if (moving) {
@@ -635,34 +688,59 @@ public class GameController {
 
     private Entity.Direction pickNextDir() {
         if (requestedDir != null && canStep(curX, curY, requestedDir)) return requestedDir;
-        if (activeDir   != null && canStep(curX, curY, activeDir))     return activeDir;
+        if (activeDir != null && canStep(curX, curY, activeDir)) return activeDir;
         return null;
     }
 
     private void startMoving(Entity.Direction dir) {
-        if (!canStep(curX, curY, dir)) { stopCakman(); return; }
+        if (!canStep(curX, curY, dir)) {
+            stopCakman();
+            return;
+        }
         // If we need to restore music volume after a collision, do it when movement resumes
         if (restoreMusicWhenMoved) {
             try {
                 AudioManager.getInstance().setMusicVolume(previousMusicVolume);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
             restoreMusicWhenMoved = false;
         }
-        activeDir = dir; moving = true; movePx = 0;
-        if (requestedDir == dir) { requestedDir = null; cakman.clearRequestedDirection(); }
+        activeDir = dir;
+        moving = true;
+        movePx = 0;
+        if (requestedDir == dir) {
+            requestedDir = null;
+            cakman.clearRequestedDirection();
+        }
         updateCakmanSprite(dir);
         switch (dir) {
-            case UP    -> { tgtX = curX;     tgtY = curY - 1; }
-            case DOWN  -> { tgtX = curX;     tgtY = curY + 1; }
-            case LEFT  -> { tgtX = curX - 1; tgtY = curY; }
-            case RIGHT -> { tgtX = curX + 1; tgtY = curY; }
+            case UP -> {
+                tgtX = curX;
+                tgtY = curY - 1;
+            }
+            case DOWN -> {
+                tgtX = curX;
+                tgtY = curY + 1;
+            }
+            case LEFT -> {
+                tgtX = curX - 1;
+                tgtY = curY;
+            }
+            case RIGHT -> {
+                tgtX = curX + 1;
+                tgtY = curY;
+            }
         }
     }
 
     private void stopCakman() {
-        moving = false; activeDir = null; requestedDir = null;
+        moving = false;
+        activeDir = null;
+        requestedDir = null;
         if (cakman != null) cakman.clearRequestedDirection();
-        tgtX = curX; tgtY = curY; movePx = 0;
+        tgtX = curX;
+        tgtY = curY;
+        movePx = 0;
         snapCakmanToCell(curX, curY);
     }
 
@@ -677,17 +755,34 @@ public class GameController {
         if (cakmanView == null || cakman == null) return;
         boolean power = cakman.isSuperMode(System.nanoTime());
         switch (dir) {
-            case UP    -> { cakmanView.setImage(power ? imgPowerUp    : imgUp);    cakmanView.setScaleX(1); }
-            case DOWN  -> { cakmanView.setImage(power ? imgPowerDown  : imgDown);  cakmanView.setScaleX(1); }
-            case LEFT  -> { cakmanView.setImage(power ? imgPowerRight : imgRight); cakmanView.setScaleX(-1); }
-            case RIGHT -> { cakmanView.setImage(power ? imgPowerRight : imgRight); cakmanView.setScaleX(1); }
+            case UP -> {
+                cakmanView.setImage(power ? imgPowerUp : imgUp);
+                cakmanView.setScaleX(1);
+            }
+            case DOWN -> {
+                cakmanView.setImage(power ? imgPowerDown : imgDown);
+                cakmanView.setScaleX(1);
+            }
+            case LEFT -> {
+                cakmanView.setImage(power ? imgPowerRight : imgRight);
+                cakmanView.setScaleX(-1);
+            }
+            case RIGHT -> {
+                cakmanView.setImage(power ? imgPowerRight : imgRight);
+                cakmanView.setScaleX(1);
+            }
         }
     }
 
     // Passable untuk CakMan
     private boolean canStep(int cx, int cy, Entity.Direction dir) {
         int nx = cx, ny = cy;
-        switch (dir) { case UP -> ny--; case DOWN -> ny++; case LEFT -> nx--; case RIGHT -> nx++; }
+        switch (dir) {
+            case UP -> ny--;
+            case DOWN -> ny++;
+            case LEFT -> nx--;
+            case RIGHT -> nx++;
+        }
         return isCakManPassable(nx, ny);
     }
 
@@ -737,7 +832,8 @@ public class GameController {
                         am.setMusicVolume(0.0);
                         am.playSoundEffect(AudioManager.SFX_COLLIDE_GHOST);
                         restoreMusicWhenMoved = true;
-                    } catch (Exception ignored) {}
+                    } catch (Exception ignored) {
+                    }
 
                     loseLife();
                     return;
@@ -750,12 +846,27 @@ public class GameController {
         if (paused || gameOver || victory) return;
         lives--;
         updateHUD();
-        if (lives <= 0) { triggerGameOver(); return; }
+        if (lives <= 0) {
+            triggerGameOver();
+            return;
+        }
         stopLoop();
         resetPositions();
         if (respawnTimeline != null) {
             respawnTimeline.stop();
         }
+        // Restore music after a brief delay (0.5 seconds)
+        Timeline restoreMusicTimeline = new Timeline(new KeyFrame(Duration.millis(500), e -> {
+            if (restoreMusicWhenMoved) {
+                try {
+                    AudioManager.getInstance().setMusicVolume(previousMusicVolume);
+                } catch (Exception ignored) {
+                }
+                restoreMusicWhenMoved = false;
+            }
+        }));
+        restoreMusicTimeline.play();
+
         respawnTimeline = new Timeline(new KeyFrame(Duration.seconds(1.5), e -> {
             respawnTimeline = null;
             if (paused || gameOver || victory || gameLoop == null) return;
@@ -767,8 +878,14 @@ public class GameController {
 
     private void resetPositions() {
         int gx = 13, gy = 21;
-        curX = gx; curY = gy; tgtX = gx; tgtY = gy;
-        activeDir = null; requestedDir = null; moving = false; movePx = 0;
+        curX = gx;
+        curY = gy;
+        tgtX = gx;
+        tgtY = gy;
+        activeDir = null;
+        requestedDir = null;
+        moving = false;
+        movePx = 0;
         cakman.setPosition(gx * MapData.TILE_SIZE, gy * MapData.TILE_SIZE);
         snapCakmanToCell(gx, gy);
         for (int i = 0; i < ghosts.size(); i++) {
@@ -787,8 +904,13 @@ public class GameController {
         iv.setLayoutY(cellY * MapData.TILE_SIZE - offset);
     }
 
-    private double lerp(double a, double b, double t) { return a + (b - a) * t; }
-    private double clamp01(double v) { return Math.max(0, Math.min(1, v)); }
+    private double lerp(double a, double b, double t) {
+        return a + (b - a) * t;
+    }
+
+    private double clamp01(double v) {
+        return Math.max(0, Math.min(1, v));
+    }
 
     private String sanitizePlayerName(String rawName) {
         if (rawName == null) return "PLAYER";
@@ -849,27 +971,32 @@ public class GameController {
     //  GhostAgent — inner class dengan AI menyebar + flee behaviour
     // =========================================================================
     private class GhostAgent {
-        final Ghost     ghost;
+        final Ghost ghost;
         final ImageView view;
-        final Image     imgUp, imgDown, imgRight;
-        final int       index;
+        final Image imgUp, imgDown, imgRight;
+        final int index;
         boolean active = true;
 
-        int    gCurX, gCurY, gTgtX, gTgtY;
+        int gCurX, gCurY, gTgtX, gTgtY;
         Entity.Direction gDir;
         boolean gMoving = false;
-        double  gMovePx = 0;
+        double gMovePx = 0;
         int releaseDelayFrames; // delay sebelum bergerak
 
         final Random rng = new Random();
 
         GhostAgent(Ghost ghost, ImageView view, Image up, Image down, Image right,
                    int startX, int startY, Entity.Direction initDir, int index) {
-            this.ghost = ghost; this.view = view;
-            this.imgUp = up; this.imgDown = down; this.imgRight = right;
+            this.ghost = ghost;
+            this.view = view;
+            this.imgUp = up;
+            this.imgDown = down;
+            this.imgRight = right;
             this.index = index;
-            this.gCurX = startX; this.gCurY = startY;
-            this.gTgtX = startX; this.gTgtY = startY;
+            this.gCurX = startX;
+            this.gCurY = startY;
+            this.gTgtX = startX;
+            this.gTgtY = startY;
             this.gDir = initDir;
         }
 
@@ -888,7 +1015,7 @@ public class GameController {
             view.setLayoutX(sx * MapData.TILE_SIZE - GHOST_OFFSET);
             view.setLayoutY(sy * MapData.TILE_SIZE - GHOST_OFFSET);
 
-            releaseDelayFrames = index * 60;
+            releaseDelayFrames = 120;
         }
 
         void updateSprite(long now) {
@@ -900,35 +1027,57 @@ public class GameController {
             }
             if (gDir == null) return;
             switch (gDir) {
-                case UP    -> { view.setImage(imgUp != null ? imgUp : imgRight);    view.setScaleX(1); }
-                case DOWN  -> { view.setImage(imgDown != null ? imgDown : imgRight); view.setScaleX(1); }
-                case LEFT  -> { view.setImage(imgRight); view.setScaleX(-1); }
-                case RIGHT -> { view.setImage(imgRight); view.setScaleX(1); }
+                case UP -> {
+                    view.setImage(imgUp != null ? imgUp : imgRight);
+                    view.setScaleX(1);
+                }
+                case DOWN -> {
+                    view.setImage(imgDown != null ? imgDown : imgRight);
+                    view.setScaleX(1);
+                }
+                case LEFT -> {
+                    view.setImage(imgRight);
+                    view.setScaleX(-1);
+                }
+                case RIGHT -> {
+                    view.setImage(imgRight);
+                    view.setScaleX(1);
+                }
             }
         }
 
         void tick(double dt) {
             if (!active) return;
-            if (releaseDelayFrames > 0) { releaseDelayFrames--; return; }
+            if (releaseDelayFrames > 0) {
+                releaseDelayFrames--;
+                return;
+            }
 
             double speed = ghost.isFrightened() ? GHOST_FRIGHT_SPEED : GHOST_SPEED;
             gMovePx += speed * dt;
 
             if (!gMoving) {
                 Entity.Direction next = chooseDir();
-                if (next != null) { gDir = next; beginMove(); }
+                if (next != null) {
+                    gDir = next;
+                    beginMove();
+                }
                 return;
             }
 
             if (gMovePx >= MapData.TILE_SIZE) {
                 gMovePx -= MapData.TILE_SIZE;
-                gCurX = gTgtX; gCurY = gTgtY;
+                gCurX = gTgtX;
+                gCurY = gTgtY;
                 ghost.setPosition(gCurX * MapData.TILE_SIZE, gCurY * MapData.TILE_SIZE);
                 view.setLayoutX(gCurX * MapData.TILE_SIZE - GHOST_OFFSET);
                 view.setLayoutY(gCurY * MapData.TILE_SIZE - GHOST_OFFSET);
                 gMoving = false;
                 Entity.Direction next = chooseDir();
-                if (next != null) { gDir = next; beginMove(); }
+                if (next != null) {
+                    gDir = next;
+                    beginMove();
+                }
             } else {
                 double t = clamp01(gMovePx / MapData.TILE_SIZE);
                 double rx = lerp(gCurX * MapData.TILE_SIZE, gTgtX * MapData.TILE_SIZE, t);
@@ -940,23 +1089,39 @@ public class GameController {
         }
 
         private void beginMove() {
-            if (!ghostCanStep(gCurX, gCurY, gDir)) { gMoving = false; return; }
-            gMoving = true; gMovePx = 0;
+            if (!ghostCanStep(gCurX, gCurY, gDir)) {
+                gMoving = false;
+                return;
+            }
+            gMoving = true;
+            gMovePx = 0;
             switch (gDir) {
-                case UP    -> { gTgtX = gCurX;     gTgtY = gCurY - 1; }
-                case DOWN  -> { gTgtX = gCurX;     gTgtY = gCurY + 1; }
-                case LEFT  -> { gTgtX = gCurX - 1; gTgtY = gCurY; }
-                case RIGHT -> { gTgtX = gCurX + 1; gTgtY = gCurY; }
+                case UP -> {
+                    gTgtX = gCurX;
+                    gTgtY = gCurY - 1;
+                }
+                case DOWN -> {
+                    gTgtX = gCurX;
+                    gTgtY = gCurY + 1;
+                }
+                case LEFT -> {
+                    gTgtX = gCurX - 1;
+                    gTgtY = gCurY;
+                }
+                case RIGHT -> {
+                    gTgtX = gCurX + 1;
+                    gTgtY = gCurY;
+                }
             }
         }
 
         /**
          * AI: saat normal → kejar CakMan dengan variasi per index
-         *      saat frightened → lari MENJAUHI CakMan
+         * saat frightened → lari MENJAUHI CakMan
          */
         private Entity.Direction chooseDir() {
-            int px = (cakman != null) ? (int)(cakman.getX() / MapData.TILE_SIZE) : gCurX;
-            int py = (cakman != null) ? (int)(cakman.getY() / MapData.TILE_SIZE) : gCurY;
+            int px = (cakman != null) ? (int) (cakman.getX() / MapData.TILE_SIZE) : gCurX;
+            int py = (cakman != null) ? (int) (cakman.getY() / MapData.TILE_SIZE) : gCurY;
 
             Entity.Direction opposite = flip(gDir);
             List<Entity.Direction> options = new ArrayList<>();
@@ -987,7 +1152,8 @@ public class GameController {
                     int[] ahead2 = next(ahead[0], ahead[1], activeDir);
                     int[] ahead3 = next(ahead2[0], ahead2[1], activeDir);
                     int[] ahead4 = next(ahead3[0], ahead3[1], activeDir);
-                    targetX = ahead4[0]; targetY = ahead4[1];
+                    targetX = ahead4[0];
+                    targetY = ahead4[1];
                 }
             } else if (index == 2 && rng.nextInt(10) < 4) {
                 // 40% acak
@@ -1003,17 +1169,21 @@ public class GameController {
 
         private int[] next(int cx, int cy, Entity.Direction d) {
             return switch (d) {
-                case UP    -> new int[]{cx, cy - 1};
-                case DOWN  -> new int[]{cx, cy + 1};
-                case LEFT  -> new int[]{cx - 1, cy};
+                case UP -> new int[]{cx, cy - 1};
+                case DOWN -> new int[]{cx, cy + 1};
+                case LEFT -> new int[]{cx - 1, cy};
                 case RIGHT -> new int[]{cx + 1, cy};
             };
         }
 
         private Entity.Direction flip(Entity.Direction d) {
             if (d == null) return null;
-            return switch (d) { case UP -> Entity.Direction.DOWN; case DOWN -> Entity.Direction.UP;
-                    case LEFT -> Entity.Direction.RIGHT; case RIGHT -> Entity.Direction.LEFT; };
+            return switch (d) {
+                case UP -> Entity.Direction.DOWN;
+                case DOWN -> Entity.Direction.UP;
+                case LEFT -> Entity.Direction.RIGHT;
+                case RIGHT -> Entity.Direction.LEFT;
+            };
         }
 
         // Ghost hanya bisa lewat tile ID 1 dan 60 (bukan 13 = wall ghost house luar)

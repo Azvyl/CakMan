@@ -22,18 +22,18 @@
                        style="-fx-background-color: rgba(0,0,0,0.65); -fx-text-fill: white; -fx-prompt-text-fill: rgba(255,255,255,0.7); -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #00FFFF; -fx-border-width: 2; -fx-padding: 10 12 10 12;" />
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="40.0">
                <children>
-                  <Button fx:id="btnScore" mnemonicParsing="false" style="-fx-background-color: transparent;">
-                     <graphic>
-                        <ImageView fitHeight="80.0" fitWidth="152.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@images/button/score.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor>
-                  </Button>
+                   <Button fx:id="btnScore" mnemonicParsing="false" onAction="#onScoreClick" style="-fx-background-color: transparent;">
+                      <graphic>
+                         <ImageView fitHeight="80.0" fitWidth="152.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                               <Image url="@images/button/score.png" />
+                            </image>
+                         </ImageView>
+                      </graphic>
+                      <cursor>
+                         <Cursor fx:constant="HAND" />
+                      </cursor>
+                   </Button>
                   <Button fx:id="btnPlay" mnemonicParsing="false" onAction="#onPlayClick" style="-fx-background-color: transparent;">
                      <graphic>
                         <ImageView fitHeight="80.0" fitWidth="138.0" pickOnBounds="true" preserveRatio="true">
